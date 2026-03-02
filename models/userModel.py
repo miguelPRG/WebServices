@@ -1,9 +1,10 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
-class User(BaseModel):
-    email: EmailStr
-    password: str = Field(..., min_length=10)
+class UserCreate(BaseModel):
+    nome: str = Field(..., max_length=50)
+    email: EmailStr = Field(..., max_length=150)
+    password: str = Field(..., min_length=10, max_length=150)
 
     @field_validator("password")
     @classmethod
@@ -24,3 +25,7 @@ class User(BaseModel):
             raise ValueError("Password contém caracteres inválidos")
 
         return value
+
+class UserLogin(BaseModel):
+    email: EmailStr = Field(..., max_length=150)
+    password: str = Field(..., min_length=10, max_length=150)

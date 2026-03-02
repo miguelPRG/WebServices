@@ -3,27 +3,14 @@ import os
 import secrets
 import base64
 from datetime import datetime, timedelta, timezone
-from functools import wraps
 
-# Produção: use JWT_SECRET_KEY via Secret Manager/KMS.
-def _load_or_generate_secret() -> str:
-    """
-    Produção: use JWT_SECRET_KEY via Secret Manager/KMS.
-    Fallback (dev): gera chave forte dinâmica no startup.
-    """
-    env_secret = os.getenv("JWT_SECRET_KEY")
-    if env_secret and len(env_secret) >= 64:  # ~>= 384 bits em texto
-        return env_secret
+def _generate_secret() -> str:
+    return base64.urlsafe_b64encode(secrets.token_bytes(64)).decode().rstrip("=")
 
-    # 512 bits de entropia, codificado em base64url
-    generated = base64.urlsafe_b64encode(secrets.token_bytes(64)).decode().rstrip("=")
-    return generated
-
-# Configuration
-SECRET_KEY = _load_or_generate_secret()
-ALGORITHM = "HS512"  # mais forte que HS256 para HMAC
+# Em produção, defina JWT_SECRET_KEY no .env
+SECRET_KEY = os.getenv("JWT_SECRET_KEY") or _generate_secret()
+ALGORITHM = "HS512"
 EXPIRATION_HOURS = 24
-
 
 def generate_jwt(user_id: str) -> str:
     now = datetime.now(timezone.utc)
