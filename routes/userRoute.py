@@ -19,7 +19,7 @@ async def create_user(user: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Já existe um utilizador com esse email")
 
-    user_dict = user.dict()
+    user_dict = user.model_dump()
     user_dict["password"] = password_hash.hash(user.password)
     data = datetime.now()
     user_dict["created_at"] = data
