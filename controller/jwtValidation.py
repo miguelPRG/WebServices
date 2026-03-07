@@ -10,7 +10,7 @@ def _generate_secret() -> str:
 # Em produção, defina JWT_SECRET_KEY no .env
 SECRET_KEY = os.getenv("JWT_SECRET_KEY") or _generate_secret()
 ALGORITHM = "HS512"
-EXPIRATION_HOURS = 24
+EXPIRATION_HOURS = 1
 
 def generate_jwt(user_id: str) -> str:
     now = datetime.now(timezone.utc)
@@ -19,9 +19,7 @@ def generate_jwt(user_id: str) -> str:
     payload = {
         "user_id": user_id,
         "iat": int(now.timestamp()),
-        "nbf": int(now.timestamp()),
         "exp": int(exp.timestamp()),
-        "jti": secrets.token_urlsafe(16),
     }
 
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
