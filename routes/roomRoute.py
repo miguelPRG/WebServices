@@ -13,8 +13,8 @@ router = APIRouter(prefix="/rooms", tags=["Rooms"])
 @router.post("/", response_model=Room)
 async def create_room(room: RoomCreate):
     room_dict = room.model_dump()
-    room_dict["created_at"] = datetime.utcnow()
-    room_dict["updated_at"] = datetime.utcnow()
+    room_dict["created_at"] = datetime.now()
+    room_dict["updated_at"] = datetime.now()
 
     result = await room_collection.insert_one(room_dict)
 
@@ -23,30 +23,14 @@ async def create_room(room: RoomCreate):
 
 
 # 🔹 Listar salas
-@router.get("/", response_model=List[Room])
-async def list_rooms():
+@router.get("/{room_id}", response_model=List[Room])
+async def list_rooms(room_id: str=None):
     rooms = []
-    async for room in room_collection.find():
+    async for room in room_collection.find(filter={"_id": ObjectId(room_id)} if room_id else {} ):
         room["id"] = str(room["_id"])
         del room["_id"]
         rooms.append(room)
     return rooms
-
-
-# 🔹 Buscar por ID
-@router.get("/{room_id}", response_model=Room)
-async def get_room(room_id: str):
-    if not ObjectId.is_valid(room_id):
-        raise HTTPException(status_code=400, detail="ID inválido")
-
-    room = await room_collection.find_one({"_id": ObjectId(room_id)})
-
-    if not room:
-        raise HTTPException(status_code=404, detail="Sala não encontrada")
-
-    room["id"] = str(room["_id"])
-    del room["_id"]
-    return room
 
 
 # 🔹 Atualizar
@@ -56,7 +40,7 @@ async def update_room(room_id: str, room: RoomCreate):
         raise HTTPException(status_code=400, detail="ID inválido")
 
     update_data = room.model_dump()
-    update_data["updated_at"] = datetime.utcnow()
+    update_data["updated_at"] = datetime.now()
 
     result = await room_collection.update_one(
         {"_id": ObjectId(room_id)},

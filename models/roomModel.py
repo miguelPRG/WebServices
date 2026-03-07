@@ -4,19 +4,22 @@ from typing import Optional
 
 
 class RoomCreate(BaseModel):
-    name: str
-    location: str
-    capacity: int
-    capacity_exam: int
-    active: bool
-    characteristic_name: str
-    building_identifier: int
+    name: Optional[str] = Field(..., max_length=255)
+    location: str = Field(..., max_length=255)
+    capacity: int  = Field(..., le=150)
+    capacity_exam: int = Field(..., le=30)
+    active: bool = Field(..., default=True)
+    characteristic_name: str = Field(..., max_length=150)
+    building_identifier: str = Field(..., max_length=50)
 
-    created_by: str = Field(..., pattern="^[0-9a-fA-F]{24}$")
-    updated_by: str = Field(..., pattern="^[0-9a-fA-F]{24}$")
+class RoomUpdate(BaseModel):
+    name: Optional[str] = Field(None, max_length=150)
+    location: Optional[str] = Field(None, max_length=255)
+    capacity: Optional[int] = Field(None, le=150)
+    capacity_exam: Optional[int] = Field(None, le=30)
+    active: Optional[bool] = Field(None, default=True)
+    characteristic_name: Optional[str] = Field(None, max_length=150)
+    building_identifier: Optional[str] = Field(None, max_length=50)
 
 
-class Room(RoomCreate):
-    id: str
-    created_at: datetime
-    updated_at: datetime
+
