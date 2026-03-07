@@ -24,19 +24,6 @@ sala_collection: AsyncIOMotorCollection | None = None
 user_sala_collection: AsyncIOMotorCollection | None = None
 
 
-async def test_database_connection(uri: str | None = None) -> bool:
-    mongo_uri = uri or MONGO_URI
-    local_client = AsyncIOMotorClient(mongo_uri, serverSelectionTimeoutMS=5000)
-    try:
-        await local_client.admin.command("ping")
-        return True
-    except PyMongoError as e:
-        print("Erro ao conectar ao MongoDB: ", str(e))
-        return False
-    finally:
-        local_client.close()
-
-
 async def init_database(uri: str | None = None, db_name: str | None = None) -> bool:
     global client, db, user_collection, sala_collection, user_sala_collection
 
@@ -46,6 +33,7 @@ async def init_database(uri: str | None = None, db_name: str | None = None) -> b
     tmp_client = AsyncIOMotorClient(mongo_uri, serverSelectionTimeoutMS=5000)
     try:
         await tmp_client.admin.command("ping")
+        print("Conexão com MongoDB bem-sucedida.")
         client = tmp_client
         db = client[mongo_db_name]
 

@@ -2,22 +2,20 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from database import test_database_connection, init_database
+from database import init_database
 from routes.userRoute import userRouter
 from routes.reservaRoute import reservaRouter
 from controller.jwtValidation import validate_jwt  # ajusta o nome se no teu ficheiro for diferente
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if await test_database_connection():
-        print("Conexão com MongoDB bem-sucedida. Inicializando banco de dados...")
-        if await init_database():
-            print("Base de dados inicializada com sucesso.")
+    if await init_database():
+        print("Base de dados inicializada com sucesso.")
     yield
 
 app = FastAPI(
-    title="Meu Projeto API",
-    tags=["Web Services"],
+    title="Reserva de Salas API",
+    tags=["Reserva de Salas API"],
     lifespan=lifespan,
 )
 
